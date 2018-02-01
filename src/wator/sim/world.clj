@@ -1,6 +1,8 @@
 (ns wator.sim.world
   (:require [wator.sim.map-grid :as wg]))
 
+; FIXME: Needs to wrap out of bounds cells instead of filtering them out!
+
 (def empty-water ::water)
 
 ; Could generate using a for by discarding when the absolute values of the x and y are the same.
@@ -35,13 +37,13 @@
 (defn position-contents-pairs [world positions]
   (map #(vector % (get-cell world %)) positions))
 
-(defn unsafe-move-cell [world old-position new-position & [reproducing?]]
+(defn unsafe-move-cell [world old-position new-position & [offspring?]]
   (let [contents (get-cell world old-position)]
 
     (as-> world w
-          (if-not reproducing?
-            (remove-cell w old-position)
-            w)
+          (if offspring?
+            (set-cell w old-position offspring?)
+            (remove-cell w old-position))
 
           (set-cell w new-position contents))))
 
